@@ -1,5 +1,4 @@
 export enum MemberGrade {
-    NORMAL = 'NORMAL',
-    VIP = 'VIP',
-    VVIP = 'VVIP',
+  NORMAL = 'NORMAL',
+  VIP = 'VIP',
 }
