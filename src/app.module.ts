@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
-import { MemberController } from './business/member/api/member.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeORMConfig } from './config/typeorm/typeorm.config';
+import {Module} from '@nestjs/common';
+import {MemberController} from './business/member/api/member.controller';
+import {DatabaseModule} from "./common/database/database.module";
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeORMConfig)],
-  controllers: [MemberController],
-  providers: [],
+    imports: [DatabaseModule],
+    controllers: [MemberController],
+    providers: [],
 })
-export class AppModule {}
+export class AppModule {
+}
