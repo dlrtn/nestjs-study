@@ -17,8 +17,4 @@ export class EnvService {
   get(key: string): string {
     return this.envConfig[key];
   }
-
-  isEnv(env: string): boolean {
-    return this.nodeEnv === env;
-  }
 }
