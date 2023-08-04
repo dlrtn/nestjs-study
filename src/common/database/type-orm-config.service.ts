@@ -1,6 +1,7 @@
 import {TypeOrmModuleOptions, TypeOrmOptionsFactory} from "@nestjs/typeorm";
 import {Injectable} from "@nestjs/common";
 import {EnvService} from "../env/env.service";
+import {SnakeNamingStrategy} from "typeorm-naming-strategies";
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -22,7 +23,8 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
                 ssl: {
                     rejectUnauthorized: this.envService.get('DATABASE_SSL_REJECT_UNAUTHORIZED') === 'true'
                 }
-            }
+            },
+            namingStrategy: new SnakeNamingStrategy(),
         };
     }
 }
