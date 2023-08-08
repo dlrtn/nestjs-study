@@ -37,7 +37,6 @@ describe('MemberService 테스트', () => {
   describe('사용자 조회 관련 기능 검증', () => {
     it('모든 사용자를 조회한다.', async () => {
       const memberList = await memberService.findAll();
-      console.log(memberList);
       expect(memberList.length).toBeGreaterThan(0);
     });
   });
