@@ -1,8 +1,14 @@
 import { MemberGrade } from './member-grade';
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-@Entity()
+@Entity({ name: 'Member' })
 export class Member {
   @PrimaryColumn()
   private readonly id: string;
@@ -21,6 +27,9 @@ export class Member {
 
   @Column()
   private readonly memberGrade: MemberGrade;
+
+  @UpdateDateColumn()
+  private readonly updatedAt: Date;
 
   @CreateDateColumn()
   private readonly createdAt: Date;
