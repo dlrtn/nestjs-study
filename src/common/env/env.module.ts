@@ -5,7 +5,7 @@ import { EnvService } from './env.service';
   providers: [
     {
       provide: EnvService,
-      useValue: new EnvService(__dirname + '/default.env'),
+      useValue: new EnvService(),
     },
   ],
   exports: [EnvService],

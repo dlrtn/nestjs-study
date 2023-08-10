@@ -15,7 +15,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       username: this.envService.get('DATABASE_USERNAME'),
       password: this.envService.get('DATABASE_PASSWORD'),
       database: this.envService.get('DATABASE_SCHEMA'),
-      entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
+      entities: [__dirname + this.envService.get('DATABASE_ENTITY_PATH')],
       synchronize: this.envService.get('DATABASE_SYNCHRONIZE') === 'true',
       logging: this.envService.get('DATABASE_LOGGING') === 'true',
       extra: {
