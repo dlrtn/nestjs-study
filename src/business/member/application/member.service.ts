@@ -3,10 +3,14 @@ import { Member } from '../domain/member.entity';
 import { MemberRepository } from '../repository/member.repository';
 import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
 import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
+import { JwtService } from '../../../common/jwt/jwt.service';
 
 @Injectable()
 export class MemberService {
-  constructor(private readonly memberRepository: MemberRepository) {}
+  constructor(
+    private readonly memberRepository: MemberRepository,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async findAll(): Promise<Member[]> {
     return await this.memberRepository.findAll();
@@ -26,14 +30,10 @@ export class MemberService {
   async login(request: MemberLoginRequestDto) {
     const member = await this.memberRepository.findByEmail(request.email);
 
-    if (!member) {
-      throw new Error('사용자를 찾을 수 없습니다.');
+    if (!member || member.getPassword() !== request.password) {
+      throw new Error('입력 정보가 부정확합니다.');
     }
 
-    if (member.getPassword() !== request.password) {
-      throw new Error('비밀번호가 일치하지 않습니다.');
-    }
-
-    return member;
+    return this.jwtService.generateToken(member.getMemberId());
   }
 }

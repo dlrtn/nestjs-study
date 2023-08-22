@@ -40,11 +40,11 @@ export class MemberController {
   @ApiOperation({ summary: '사용자 로그인 API' })
   @ApiOkResponse({ description: '사용자 인증을 통해 사용자 정보를 반환한다.' })
   async login(@Res() res: Response, @Body() request: MemberLoginRequestDto) {
-    const member = await this.memberService.login(request);
+    const accessToken = await this.memberService.login(request);
 
     return res.json({
       message: '사용자 인증을 통해 사용자 정보를 반환한다.',
-      member: member,
+      accessToken: accessToken,
     });
   }
 }
