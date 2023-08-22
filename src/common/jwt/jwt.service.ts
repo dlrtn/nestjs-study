@@ -6,9 +6,15 @@ import { EnvService } from '../env/env.service';
 export class JwtService {
   constructor(private envService: EnvService) {}
 
-  public generateToken(payload: any): string {
+  public generateAccessToken(payload: any): string {
     return jwt.sign({ userId: payload }, this.envService.get('JWT_SECRET'), {
       expiresIn: this.envService.get('ACCESS_EXPIRES_IN'),
+    });
+  }
+
+  public generateRefreshToken(payload: any): string {
+    return jwt.sign({ userId: payload }, this.envService.get('JWT_SECRET'), {
+      expiresIn: this.envService.get('REFRESH_EXPIRES_IN'),
     });
   }
 
