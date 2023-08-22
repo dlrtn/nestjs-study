@@ -4,7 +4,7 @@ import { EnvService } from '../env/env.service';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export default class RedisService {
+export class RedisService {
   public client: RedisClientType<RedisModules>;
 
   constructor(private readonly envService: EnvService) {

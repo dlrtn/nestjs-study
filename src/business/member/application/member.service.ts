@@ -4,7 +4,7 @@ import { MemberRepository } from '../repository/member.repository';
 import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
 import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
 import { JwtService } from '../../../common/jwt/jwt.service';
-import RedisService from '../../../common/redis/redis.service';
+import { RedisService } from '../../../common/redis/redis.service';
 
 @Injectable()
 export class MemberService {
