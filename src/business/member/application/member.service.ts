@@ -4,12 +4,14 @@ import { MemberRepository } from '../repository/member.repository';
 import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
 import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
 import { JwtService } from '../../../common/jwt/jwt.service';
+import RedisService from '../../../common/redis/redis.service';
 
 @Injectable()
 export class MemberService {
   constructor(
     private readonly memberRepository: MemberRepository,
     private readonly jwtService: JwtService,
+    private readonly redisService: RedisService,
   ) {}
 
   async findAll(): Promise<Member[]> {
@@ -34,6 +36,15 @@ export class MemberService {
       throw new Error('입력 정보가 부정확합니다.');
     }
 
-    return this.jwtService.generateToken(member.getMemberId());
+    const accessToken = this.jwtService.generateAccessToken(
+      member.getMemberId(),
+    );
+    const refreshToken = this.jwtService.generateRefreshToken(
+      member.getMemberId(),
+    );
+
+    await this.redisService.set(refreshToken, member.getMemberId());
+
+    return accessToken;
   }
 }
