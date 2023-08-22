@@ -11,4 +11,10 @@ export class MemberRepository extends Repository<Member> {
   async findAll(): Promise<Member[]> {
     return await this.find();
   }
+
+  async findByEmail(email: string): Promise<Member> {
+    return await this.createQueryBuilder('member')
+      .where('member.email = :email', { email })
+      .getOneOrFail();
+  }
 }
