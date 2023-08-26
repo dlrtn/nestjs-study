@@ -8,7 +8,7 @@ import { MemberModule } from './business/member/member.module';
     MemberModule,
     DatabaseModule,
     CacheModule.register({
-      url: 'redis://default:b9d36cd2bd3f4ba487d87a5ba6fea015@relieved-serval-44529.upstash.io:44529',
+      url: process.env.REDIS_URL,
       ttl: 31557600,
     }),
   ],
