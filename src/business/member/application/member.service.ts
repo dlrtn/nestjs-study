@@ -1,17 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Member } from '../domain/member.entity';
 import { MemberRepository } from '../repository/member.repository';
 import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
 import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
 import { JwtService } from '../../../common/jwt/jwt.service';
-import { RedisService } from '../../../common/redis/redis.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class MemberService {
   constructor(
     private readonly memberRepository: MemberRepository,
     private readonly jwtService: JwtService,
-    private readonly redisService: RedisService,
+    // private readonly redisService: RedisService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   async findAll(): Promise<Member[]> {
@@ -43,7 +45,8 @@ export class MemberService {
       member.getMemberId(),
     );
 
-    await this.redisService.set(refreshToken, member.getMemberId());
+    // await this.redisService.set(refreshToken, member.getMemberId());
+    await this.cacheManager.set(refreshToken, member.getMemberId());
 
     return accessToken;
   }
