@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Member } from '../domain/member.entity';
 import { MemberRepository } from '../repository/member.repository';
 import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
@@ -37,7 +37,7 @@ export class MemberService {
     const memberId = member.getMemberId();
 
     if (!member || member.getPassword() !== request.password) {
-      throw new Error('입력 정보가 부정확합니다.');
+      throw new BadRequestException('입력 정보가 부정확합니다.');
     }
 
     const accessToken = this.jwtService.generateAccessToken(memberId);
