@@ -1,21 +1,30 @@
 import { MemberService } from '../../src/business/member/application/member.service';
 import { MemberRepository } from '../../src/business/member/repository/member.repository';
 import { Test } from '@nestjs/testing';
-import { RedisService } from '../../src/common/redis/redis.service';
 import { JwtService } from '../../src/common/jwt/jwt.service';
 import { Member } from '../../src/business/member/domain/member.entity';
+import { EnvService } from '../../src/common/env/env.service';
+import { getRedisToken } from '@liaoliaots/nestjs-redis';
 
 describe('MemberService 테스트', () => {
   let memberService: MemberService;
   let mockMemberRepository: jest.Mocked<MemberRepository>;
   let mockJwtService: jest.Mocked<JwtService>;
-  let mockRedisService: jest.Mocked<RedisService>;
+  let mockEnvService: jest.Mocked<EnvService>;
   let mockMember: jest.Mocked<Member>;
+  let set: jest.Mock;
 
   beforeEach(async () => {
+    set = jest.fn();
     const module = await Test.createTestingModule({
       providers: [
         MemberService,
+        {
+          provide: EnvService,
+          useValue: {
+            get: jest.fn().mockReturnValue('test'),
+          },
+        },
         {
           provide: MemberRepository,
           useValue: {
@@ -43,16 +52,16 @@ describe('MemberService 테스트', () => {
           },
         },
         {
-          provide: RedisService,
-          useValue: {
-            set: jest.fn().mockResolvedValue(true),
-          },
-        },
-        {
           provide: Member,
           useValue: {
             getMemberId: jest.fn().mockReturnValue(1),
             getPassword: jest.fn().mockReturnValue('test'),
+          },
+        },
+        {
+          provide: getRedisToken('refreshTokenRedis'),
+          useValue: {
+            set,
           },
         },
       ],
@@ -61,8 +70,8 @@ describe('MemberService 테스트', () => {
     memberService = module.get<MemberService>(MemberService);
     mockMemberRepository = module.get(MemberRepository);
     mockJwtService = module.get(JwtService);
-    mockRedisService = module.get(RedisService);
     mockMember = module.get(Member);
+    mockEnvService = module.get(EnvService);
   });
 
   describe('사용자 조회 관련 기능 검증', () => {
@@ -95,7 +104,8 @@ describe('MemberService 테스트', () => {
       });
       expect(accessToken).toBeDefined();
       expect(accessToken).toBe('accessToken');
-      expect(mockRedisService.set).toBeCalledTimes(1);
+      expect(set).toHaveBeenCalledTimes(1);
+      expect(mockEnvService.get).toHaveBeenCalledTimes(1);
       expect(mockJwtService.generateAccessToken).toBeCalledTimes(1);
       expect(mockJwtService.generateRefreshToken).toBeCalledTimes(1);
     });
