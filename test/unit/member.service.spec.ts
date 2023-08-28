@@ -1,10 +1,10 @@
 import { MemberService } from '../../src/business/member/application/member.service';
 import { MemberRepository } from '../../src/business/member/repository/member.repository';
 import { Test } from '@nestjs/testing';
+import { JwtService } from '../../src/common/jwt/jwt.service';
 import { Member } from '../../src/business/member/domain/member.entity';
 import { EnvService } from '../../src/common/env/env.service';
 import { getRedisToken } from '@liaoliaots/nestjs-redis';
-import { JwtService } from '@nestjs/jwt';
 
 describe('MemberService 테스트', () => {
   let memberService: MemberService;
@@ -16,7 +16,6 @@ describe('MemberService 테스트', () => {
 
   beforeEach(async () => {
     set = jest.fn();
-
     const module = await Test.createTestingModule({
       providers: [
         MemberService,
@@ -48,14 +47,15 @@ describe('MemberService 테스트', () => {
         {
           provide: JwtService,
           useValue: {
-            sign: jest.fn().mockReturnValue('jwtToken'),
+            generateAccessToken: jest.fn().mockReturnValue('accessToken'),
+            generateRefreshToken: jest.fn().mockReturnValue('refreshToken'),
           },
         },
         {
           provide: Member,
           useValue: {
             getMemberId: jest.fn().mockReturnValue(1),
-            checkPassword: jest.fn().mockReturnValue(true),
+            getPassword: jest.fn().mockReturnValue('test'),
           },
         },
         {
@@ -102,14 +102,12 @@ describe('MemberService 테스트', () => {
         email: 'test@test.test',
         password: 'test',
       });
-
       expect(accessToken).toBeDefined();
-      expect(accessToken).toBe('jwtToken');
+      expect(accessToken).toBe('accessToken');
       expect(set).toHaveBeenCalledTimes(1);
-      expect(mockEnvService.get).toHaveBeenCalledTimes(3);
-      expect(mockJwtService.sign).toBeCalledTimes(2);
-      expect(mockMember.getMemberId()).toBe(1);
-      expect(mockMember.checkPassword('test')).toBe(true);
+      expect(mockEnvService.get).toHaveBeenCalledTimes(1);
+      expect(mockJwtService.generateAccessToken).toBeCalledTimes(1);
+      expect(mockJwtService.generateRefreshToken).toBeCalledTimes(1);
     });
   });
 });
