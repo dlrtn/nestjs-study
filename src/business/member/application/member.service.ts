@@ -1,19 +1,20 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Member } from '../domain/member.entity';
 import { MemberRepository } from '../repository/member.repository';
 import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
 import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
 import { JwtService } from '../../../common/jwt/jwt.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import Redis from 'ioredis';
+import { EnvService } from '../../../common/env/env.service';
 
 @Injectable()
 export class MemberService {
   constructor(
+    private readonly envService: EnvService,
     private readonly memberRepository: MemberRepository,
     private readonly jwtService: JwtService,
-    // private readonly redisService: RedisService,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @InjectRedis('refreshTokenRedis') private readonly refreshTokenRedis: Redis,
   ) {}
 
   async findAll(): Promise<Member[]> {
@@ -31,22 +32,23 @@ export class MemberService {
     return await this.memberRepository.save(member);
   }
 
-  async login(request: MemberLoginRequestDto) {
+  async login(request: MemberLoginRequestDto): Promise<string> {
     const member = await this.memberRepository.findByEmail(request.email);
+    const memberId = member.getMemberId();
 
     if (!member || member.getPassword() !== request.password) {
       throw new Error('입력 정보가 부정확합니다.');
     }
 
-    const accessToken = this.jwtService.generateAccessToken(
-      member.getMemberId(),
-    );
-    const refreshToken = this.jwtService.generateRefreshToken(
-      member.getMemberId(),
-    );
+    const accessToken = this.jwtService.generateAccessToken(memberId);
+    const refreshToken = this.jwtService.generateRefreshToken(memberId);
 
-    // await this.redisService.set(refreshToken, member.getMemberId());
-    await this.cacheManager.set(refreshToken, member.getMemberId());
+    await this.refreshTokenRedis.set(
+      memberId,
+      refreshToken,
+      'EX',
+      this.envService.get('REFRESH_TOKEN_REDIS_TTL'),
+    );
 
     return accessToken;
   }
