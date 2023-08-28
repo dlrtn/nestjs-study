@@ -14,7 +14,7 @@ export class MemberRegisterRequestDto {
   public readonly email: string;
 
   @IsNotEmpty()
-  @IsStrongPassword()
+  @IsStrongPassword({ minLength: 8, minUppercase: 1, minSymbols: 1 })
   @ApiProperty({ description: '비밀번호', example: '1234' })
   public readonly password: string;
 
