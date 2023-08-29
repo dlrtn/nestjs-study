@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import {
+  ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
@@ -18,7 +19,11 @@ export class MemberController {
 
   @Get()
   @ApiOperation({ summary: '모든 사용자 조회 API' })
-  @ApiOkResponse({ description: '모든 사용자를 조회한다.', type: Member })
+  @ApiOkResponse({
+    description: '모든 사용자를 조회한다.',
+    type: Member,
+    isArray: true,
+  })
   async findAll(@Res() res: Response) {
     const memberList = await this.memberService.findAll();
     return res.status(HttpStatus.OK).json(memberList);
@@ -26,7 +31,11 @@ export class MemberController {
 
   @Post()
   @ApiOperation({ summary: '사용자 생성 API' })
-  @ApiCreatedResponse({ description: '사용자를 생성한다.', type: Member })
+  @ApiCreatedResponse({
+    description: '사용자를 생성한다.',
+    type: Member,
+    status: 201,
+  })
   async create(
     @Res() res: Response,
     @Body() request: MemberRegisterRequestDto,
@@ -41,6 +50,9 @@ export class MemberController {
   @ApiOkResponse({
     description: '사용자 인증을 통해 Jwt 토큰을 반환한다.',
     type: String,
+  })
+  @ApiBadRequestResponse({
+    description: '입력 정보가 부정확합니다.',
   })
   async login(@Res() res: Response, @Body() request: MemberLoginRequestDto) {
     const accessToken = await this.memberService.login(request);
