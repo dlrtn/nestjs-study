@@ -34,11 +34,11 @@ export class MemberService {
 
   async login(request: MemberLoginRequestDto): Promise<string> {
     const member = await this.memberRepository.findByEmail(request.email);
-    const memberId = member.getMemberId();
 
     if (!member || member.getPassword() !== request.password) {
       throw new BadRequestException('입력 정보가 부정확합니다.');
     }
+    const memberId = member.getMemberId();
 
     const accessToken = this.jwtService.generateAccessToken(memberId);
     const refreshToken = this.jwtService.generateRefreshToken(memberId);
