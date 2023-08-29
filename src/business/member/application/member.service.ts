@@ -4,14 +4,17 @@ import { MemberRepository } from '../repository/member.repository';
 import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
 import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
 import { JwtService } from '../../../common/jwt/jwt.service';
-import { RedisService } from '../../../common/redis/redis.service';
+import { EnvService } from '../../../common/env/env.service';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import Redis from 'ioredis';
 
 @Injectable()
 export class MemberService {
   constructor(
     private readonly memberRepository: MemberRepository,
+    private readonly envService: EnvService,
     private readonly jwtService: JwtService,
-    private readonly redisService: RedisService,
+    @InjectRedis('refreshTokenRedis') private readonly refreshTokenRedis: Redis,
   ) {}
 
   async findAll(): Promise<Member[]> {
@@ -29,21 +32,23 @@ export class MemberService {
     return await this.memberRepository.save(member);
   }
 
-  async login(request: MemberLoginRequestDto) {
+  async login(request: MemberLoginRequestDto): Promise<string> {
     const member = await this.memberRepository.findByEmail(request.email);
+    const memberId = member.getMemberId();
 
     if (!member || member.getPassword() !== request.password) {
       throw new Error('입력 정보가 부정확합니다.');
     }
 
-    const accessToken = this.jwtService.generateAccessToken(
-      member.getMemberId(),
-    );
-    const refreshToken = this.jwtService.generateRefreshToken(
-      member.getMemberId(),
-    );
+    const accessToken = this.jwtService.generateAccessToken(memberId);
+    const refreshToken = this.jwtService.generateRefreshToken(memberId);
 
-    await this.redisService.set(refreshToken, member.getMemberId());
+    await this.refreshTokenRedis.set(
+      memberId,
+      refreshToken,
+      'EX',
+      this.envService.get('REFRESH_TOKEN_REDIS_TTL'),
+    );
 
     return accessToken;
   }
