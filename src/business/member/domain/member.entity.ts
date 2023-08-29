@@ -11,41 +11,69 @@ import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ name: 'Member' })
 export class Member {
-  @PrimaryColumn()
+  @PrimaryColumn({
+    comment: '사용자 아이디',
+    length: 36,
+    type: 'varchar',
+  })
   @ApiProperty({
     description: '사용자 아이디',
     example: 'uuid',
   })
   private readonly id: string;
 
-  @Column()
+  @Column({
+    comment: '사용자 이메일',
+    length: 100,
+    type: 'varchar',
+  })
   @ApiProperty({ description: '이메일', example: 'test@test.com' })
   private readonly email: string;
 
-  @Column()
+  @Column({
+    comment: '사용자 비밀번호',
+    length: 255,
+    type: 'varchar',
+  })
   @ApiProperty({ description: '비밀번호', example: '1234' })
   private readonly password: string;
 
-  @Column()
+  @Column({
+    comment: '사용자 닉네임',
+    length: 100,
+    type: 'varchar',
+  })
   @ApiProperty({ description: '닉네임', example: '테스트' })
   private readonly nickname: string;
 
-  @Column()
+  @Column({
+    comment: '사용자 전화번호',
+    length: 15,
+    type: 'varchar',
+  })
   @ApiProperty({ description: '전화번호', example: '010-1234-5678' })
   private readonly phoneNumber: string;
 
-  @Column()
+  @Column({
+    comment: '사용자 등급',
+    length: 10,
+    type: 'varchar',
+  })
   @ApiProperty({ description: '회원 등급', example: MemberGrade.NORMAL })
   private readonly memberGrade: MemberGrade;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({
+    comment: '사용자 수정일',
+  })
   @ApiProperty({
     description: '최종 수정일',
     example: new Date('2021-01-01 00:00:00'),
   })
   private readonly updatedAt: Date;
 
-  @CreateDateColumn()
+  @CreateDateColumn({
+    comment: '사용자 생성일',
+  })
   @ApiProperty({
     description: '생성일',
     example: new Date('2021-01-01 00:00:00'),
