@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MemberService } from '../application/member.service';
 import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
+import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
 
 @Controller('/api/members')
 @ApiTags('사용자 API')
@@ -32,6 +33,18 @@ export class MemberController {
     return res.json({
       message: '사용자를 생성한다.',
       member: member,
+    });
+  }
+
+  @Post('/login')
+  @ApiOperation({ summary: '사용자 로그인 API' })
+  @ApiOkResponse({ description: '사용자 인증을 통해 사용자 정보를 반환한다.' })
+  async login(@Res() res: Response, @Body() request: MemberLoginRequestDto) {
+    const accessToken = await this.memberService.login(request);
+
+    return res.json({
+      message: '사용자 인증을 통해 사용자 정보를 반환한다.',
+      accessToken: accessToken,
     });
   }
 }
