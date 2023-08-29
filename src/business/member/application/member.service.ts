@@ -1,18 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Member } from '../domain/member.entity';
 import { MemberRepository } from '../repository/member.repository';
 import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
 import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
 import { JwtService } from '../../../common/jwt/jwt.service';
-import { EnvService } from '../../../common/env/env.service';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
+import { EnvService } from '../../../common/env/env.service';
 
 @Injectable()
 export class MemberService {
   constructor(
-    private readonly memberRepository: MemberRepository,
     private readonly envService: EnvService,
+    private readonly memberRepository: MemberRepository,
     private readonly jwtService: JwtService,
     @InjectRedis('refreshTokenRedis') private readonly refreshTokenRedis: Redis,
   ) {}
@@ -37,7 +37,7 @@ export class MemberService {
     const memberId = member.getMemberId();
 
     if (!member || member.getPassword() !== request.password) {
-      throw new Error('입력 정보가 부정확합니다.');
+      throw new BadRequestException('입력 정보가 부정확합니다.');
     }
 
     const accessToken = this.jwtService.generateAccessToken(memberId);
