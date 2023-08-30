@@ -1,4 +1,12 @@
-import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { Response } from 'express';
 import {
   ApiBadRequestResponse,
@@ -11,6 +19,8 @@ import { MemberService } from '../application/member.service';
 import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
 import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
 import { Member } from '../domain/member.entity';
+import { JwtAuthGuard } from '../../../common/passport/jwt.auth-guard';
+import { LocalAuthGuard } from '../../../common/passport/local.auth-guard';
 
 @Controller('/api/members')
 @ApiTags('사용자 API')
@@ -24,6 +34,7 @@ export class MemberController {
     type: Member,
     isArray: true,
   })
+  @UseGuards(JwtAuthGuard)
   async findAll(@Res() res: Response) {
     const memberList = await this.memberService.findAll();
     return res.status(HttpStatus.OK).json(memberList);
@@ -54,6 +65,7 @@ export class MemberController {
   @ApiBadRequestResponse({
     description: '입력 정보가 부정확합니다.',
   })
+  @UseGuards(LocalAuthGuard)
   async login(@Res() res: Response, @Body() request: MemberLoginRequestDto) {
     const accessToken = await this.memberService.login(request);
 
