@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiProperty } from '@nestjs/swagger';
-import sha256 from 'crypto-js/sha256';
+import * as sha256 from 'crypto-js/sha256';
 
 @Entity({ name: 'Member' })
 export class Member {
