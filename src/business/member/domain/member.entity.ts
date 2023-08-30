@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiProperty } from '@nestjs/swagger';
+import sha256 from 'crypto-js/sha256';
 
 @Entity({ name: 'Member' })
 export class Member {
@@ -88,7 +89,7 @@ export class Member {
   ) {
     this.id = uuidv4();
     this.email = email;
-    this.password = password;
+    this.password = this.hashPassword(password);
     this.nickname = nickname;
     this.phoneNumber = phoneNumber;
     this.memberGrade = MemberGrade.NORMAL;
@@ -116,5 +117,13 @@ export class Member {
 
   public getMemberGrade(): string {
     return this.memberGrade;
+  }
+
+  private hashPassword(password: string): string {
+    return sha256(password).toString();
+  }
+
+  public checkPassword(password: string): boolean {
+    return this.password === this.hashPassword(password);
   }
 }
