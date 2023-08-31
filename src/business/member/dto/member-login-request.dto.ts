@@ -10,4 +10,9 @@ export class MemberLoginRequestDto {
   @IsNotEmpty()
   @ApiProperty({ description: '비밀번호', example: '1234' })
   public readonly password: string;
+
+  constructor(email: string, password: string) {
+    this.email = email;
+    this.password = password;
+  }
 }

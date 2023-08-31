@@ -1,4 +1,12 @@
-import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { Response } from 'express';
 import {
   ApiBadRequestResponse,
@@ -11,6 +19,7 @@ import { MemberService } from '../application/member.service';
 import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
 import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
 import { Member } from '../domain/member.entity';
+import { JwtAuthGuard } from '../../../common/passport/jwt.auth-guard';
 
 @Controller('/api/members')
 @ApiTags('사용자 API')
@@ -24,6 +33,7 @@ export class MemberController {
     type: Member,
     isArray: true,
   })
+  @UseGuards(JwtAuthGuard)
   async findAll(@Res() res: Response) {
     const memberList = await this.memberService.findAll();
     return res.status(HttpStatus.OK).json(memberList);

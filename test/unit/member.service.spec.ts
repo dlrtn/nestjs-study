@@ -1,10 +1,10 @@
 import { MemberService } from '../../src/business/member/application/member.service';
 import { MemberRepository } from '../../src/business/member/repository/member.repository';
 import { Test } from '@nestjs/testing';
-import { JwtService } from '../../src/common/jwt/jwt.service';
 import { Member } from '../../src/business/member/domain/member.entity';
 import { EnvService } from '../../src/common/env/env.service';
 import { getRedisToken } from '@liaoliaots/nestjs-redis';
+import { JwtService } from '@nestjs/jwt';
 
 describe('MemberService 테스트', () => {
   let memberService: MemberService;
@@ -48,15 +48,14 @@ describe('MemberService 테스트', () => {
         {
           provide: JwtService,
           useValue: {
-            generateAccessToken: jest.fn().mockReturnValue('accessToken'),
-            generateRefreshToken: jest.fn().mockReturnValue('refreshToken'),
+            sign: jest.fn().mockReturnValue('jwtToken'),
           },
         },
         {
           provide: Member,
           useValue: {
             getMemberId: jest.fn().mockReturnValue(1),
-            getPassword: jest.fn().mockReturnValue('test'),
+            checkPassword: jest.fn().mockReturnValue(true),
           },
         },
         {
@@ -105,11 +104,12 @@ describe('MemberService 테스트', () => {
       });
 
       expect(accessToken).toBeDefined();
-      expect(accessToken).toBe('accessToken');
+      expect(accessToken).toBe('jwtToken');
       expect(set).toHaveBeenCalledTimes(1);
-      expect(mockEnvService.get).toHaveBeenCalledTimes(1);
-      expect(mockJwtService.generateAccessToken).toBeCalledTimes(1);
-      expect(mockJwtService.generateRefreshToken).toBeCalledTimes(1);
+      expect(mockEnvService.get).toHaveBeenCalledTimes(3);
+      expect(mockJwtService.sign).toBeCalledTimes(2);
+      expect(mockMember.getMemberId()).toBe(1);
+      expect(mockMember.checkPassword('test')).toBe(true);
     });
   });
 });
