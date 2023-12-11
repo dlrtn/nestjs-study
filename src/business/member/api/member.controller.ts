@@ -4,6 +4,8 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MemberService } from '../application/member.service';
 import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
 import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
+import { OkResponse } from '../../../common/response/success/ok-response';
+import { CreatedResponse } from '../../../common/response/success/created-response';
 
 @Controller('/api/members')
 @ApiTags('사용자 API')
@@ -15,10 +17,8 @@ export class MemberController {
   @ApiOkResponse({ description: '모든 사용자를 조회한다.' })
   async findAll(@Res() res: Response) {
     const memberList = await this.memberService.findAll();
-    return res.json({
-      message: '모든 사용자를 조회한다.',
-      memberList: memberList,
-    });
+
+    return OkResponse.of(res, '사용자 조회에 성공했습니다.', memberList);
   }
 
   @Post()
@@ -30,10 +30,7 @@ export class MemberController {
   ) {
     const member = await this.memberService.register(request);
 
-    return res.json({
-      message: '사용자를 생성한다.',
-      member: member,
-    });
+    return CreatedResponse.of(res, '사용자 생성에 성공했습니다.', member);
   }
 
   @Post('/login')
@@ -42,9 +39,6 @@ export class MemberController {
   async login(@Res() res: Response, @Body() request: MemberLoginRequestDto) {
     const accessToken = await this.memberService.login(request);
 
-    return res.json({
-      message: '사용자 인증을 통해 사용자 정보를 반환한다.',
-      accessToken: accessToken,
-    });
+    return OkResponse.of(res, '사용자 로그인에 성공했습니다.', accessToken);
   }
 }
