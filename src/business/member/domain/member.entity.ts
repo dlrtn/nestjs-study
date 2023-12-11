@@ -34,18 +34,41 @@ export class Member {
   @CreateDateColumn()
   private readonly createdAt: Date;
 
-  constructor(
+  private constructor(
+    id: string,
     email: string,
     password: string,
     nickname: string,
     phoneNumber: string,
+    memberGrade: MemberGrade,
   ) {
-    this.id = uuidv4();
+    this.id = id;
     this.email = email;
     this.password = password;
     this.nickname = nickname;
     this.phoneNumber = phoneNumber;
-    this.memberGrade = MemberGrade.NORMAL;
+    this.memberGrade = memberGrade;
+  }
+
+  public static of(
+    email: string,
+    password: string,
+    nickname: string,
+    phoneNumber: string,
+  ): Member {
+    const memberId = uuidv4();
+    const memberGrade = MemberGrade.NORMAL;
+
+    const member = new Member(
+      memberId,
+      email,
+      password,
+      nickname,
+      phoneNumber,
+      memberGrade,
+    );
+
+    return member;
   }
 
   public getMemberId(): string {
