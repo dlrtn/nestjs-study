@@ -16,8 +16,14 @@ export class MemberAuthService {
 
   public generateMemberJwtDto(member: Member): MemberJwtDto {
     return MemberJwtDto.of(
-      this.jwtService.generateAccessToken(member.getMemberId()),
-      this.jwtService.generateRefreshToken(member.getMemberId()),
+      this.jwtService.generateJsonWebToken(
+        member.getMemberId(),
+        this.envService.get('ACCESS_TOKEN_TTL'),
+      ),
+      this.jwtService.generateJsonWebToken(
+        member.getMemberId(),
+        this.envService.get('REFRESH_TOKEN_TTL'),
+      ),
     );
   }
 
