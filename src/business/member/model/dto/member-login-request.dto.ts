@@ -15,4 +15,8 @@ export class MemberLoginRequestDto {
     this.email = email;
     this.password = password;
   }
+
+  public static of(email: string, password: string): MemberLoginRequestDto {
+    return new MemberLoginRequestDto(email, password);
+  }
 }
