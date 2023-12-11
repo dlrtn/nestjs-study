@@ -1,20 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Member } from '../domain/member.entity';
 import { MemberRepository } from '../repository/member.repository';
-import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
-import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
-import { JwtService } from '../../../common/jwt/jwt.service';
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
-import Redis from 'ioredis';
-import { EnvService } from '../../../common/env/env.service';
+import { MemberRegisterRequestDto } from '../model/dto/member-register-request.dto';
+import { MemberLoginRequestDto } from '../model/dto/member-login-request.dto';
+import { MemberAuthService } from './member-auth.service';
+import { MemberValidService } from './member-valid.service';
 
 @Injectable()
 export class MemberService {
   constructor(
-    private readonly envService: EnvService,
     private readonly memberRepository: MemberRepository,
-    private readonly jwtService: JwtService,
-    @InjectRedis('refreshTokenRedis') private readonly refreshTokenRedis: Redis,
+    private readonly memberAuthService: MemberAuthService,
+    private readonly memberValidService: MemberValidService,
   ) {}
 
   async findAll(): Promise<Member[]> {
@@ -22,7 +19,7 @@ export class MemberService {
   }
 
   async register(request: MemberRegisterRequestDto): Promise<Member> {
-    const member = new Member(
+    const member = Member.of(
       request.email,
       request.password,
       request.nickname,
@@ -34,22 +31,10 @@ export class MemberService {
 
   async login(request: MemberLoginRequestDto): Promise<string> {
     const member = await this.memberRepository.findByEmail(request.email);
-    const memberId = member.getMemberId();
+    this.memberValidService.validateCredentials(member, request);
 
-    if (!member || member.getPassword() !== request.password) {
-      throw new BadRequestException('입력 정보가 부정확합니다.');
-    }
-
-    const accessToken = this.jwtService.generateAccessToken(memberId);
-    const refreshToken = this.jwtService.generateRefreshToken(memberId);
-
-    await this.refreshTokenRedis.set(
-      memberId,
-      refreshToken,
-      'EX',
-      this.envService.get('REFRESH_TOKEN_REDIS_TTL'),
-    );
-
-    return accessToken;
+    const memberJwtDto = this.memberAuthService.generateMemberJwtDto(member);
+    await this.memberAuthService.saveRefreshToken(member, memberJwtDto);
+    return memberJwtDto.getAccessToken();
   }
 }

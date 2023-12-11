@@ -2,8 +2,8 @@ import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MemberService } from '../application/member.service';
-import { MemberRegisterRequestDto } from '../dto/member-register-request.dto';
-import { MemberLoginRequestDto } from '../dto/member-login-request.dto';
+import { MemberRegisterRequestDto } from '../model/dto/member-register-request.dto';
+import { MemberLoginRequestDto } from '../model/dto/member-login-request.dto';
 import { OkResponse } from '../../../common/response/success/ok-response';
 import { CreatedResponse } from '../../../common/response/success/created-response';
 
