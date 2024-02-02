@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ApiProperty } from '@nestjs/swagger';
 import * as sha256 from 'crypto-js/sha256';
 
-@Entity({ name: 'Member' })
+@Entity({ name: 'member' })
 export class Member {
   @PrimaryColumn({
     comment: '사용자 아이디',
@@ -81,18 +81,41 @@ export class Member {
   })
   private readonly createdAt: Date;
 
-  constructor(
+  private constructor(
+    id: string,
     email: string,
     password: string,
     nickname: string,
     phoneNumber: string,
+    memberGrade: MemberGrade,
   ) {
-    this.id = uuidv4();
+    this.id = id;
     this.email = email;
     this.password = this.hashPassword(password);
     this.nickname = nickname;
     this.phoneNumber = phoneNumber;
-    this.memberGrade = MemberGrade.NORMAL;
+    this.memberGrade = memberGrade;
+  }
+
+  public static of(
+    email: string,
+    password: string,
+    nickname: string,
+    phoneNumber: string,
+  ): Member {
+    const memberId = uuidv4();
+    const memberGrade = MemberGrade.NORMAL;
+
+    const member = new Member(
+      memberId,
+      email,
+      password,
+      nickname,
+      phoneNumber,
+      memberGrade,
+    );
+
+    return member;
   }
 
   public getMemberId(): string {
