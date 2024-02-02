@@ -12,6 +12,18 @@ export class JwtService {
     });
   }
 
+  public generateAccessToken(payload: unknown): string {
+    return jwt.sign({ userId: payload }, this.envService.get('JWT_SECRET'), {
+      expiresIn: this.envService.get('ACCESS_TOKEN_TTL'),
+    });
+  }
+
+  public generateRefreshToken(payload: unknown): string {
+    return jwt.sign({ userId: payload }, this.envService.get('JWT_SECRET'), {
+      expiresIn: this.envService.get('REFRESH_TOKEN_TTL'),
+    });
+  }
+
   public verifyToken(token: string) {
     return jwt.verify(token, this.envService.get('JWT_SECRET'));
   }

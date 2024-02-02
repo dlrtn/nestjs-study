@@ -18,15 +18,17 @@ export class MemberService {
     return await this.memberRepository.findAll();
   }
 
-  async register(request: MemberRegisterRequestDto): Promise<Member> {
-    const member = Member.of(
-      request.email,
-      request.password,
-      request.nickname,
-      request.phoneNumber,
+  async register(
+    memberRegisterRequestDto: MemberRegisterRequestDto,
+  ): Promise<Member> {
+    return await this.memberRepository.save(
+      Member.of(
+        memberRegisterRequestDto.email,
+        memberRegisterRequestDto.password,
+        memberRegisterRequestDto.nickname,
+        memberRegisterRequestDto.phoneNumber,
+      ),
     );
-
-    return await this.memberRepository.save(member);
   }
 
   async login(request: MemberLoginRequestDto): Promise<string> {

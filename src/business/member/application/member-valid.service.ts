@@ -7,18 +7,21 @@ import { AuthenticationException } from '../model/exception/authentication.excep
 export class MemberValidService {
   public validateCredentials(
     member: Member,
-    request: MemberLoginRequestDto,
+    memberLoginRequestDto: MemberLoginRequestDto,
   ): void {
-    if (this.memberExists(member) || this.isPasswordCorrect(member, request)) {
+    if (
+      this.memberExists(member) ||
+      this.isPasswordCorrect(member, memberLoginRequestDto)
+    ) {
       throw AuthenticationException.of();
     }
   }
 
-  private isPasswordCorrect(member: Member, request: MemberLoginRequestDto) {
-    return member.getPassword() !== request.password;
-  }
-
   private memberExists(member: Member) {
     return !member;
+  }
+
+  private isPasswordCorrect(member: Member, request: MemberLoginRequestDto) {
+    return member.getPassword() !== request.password;
   }
 }
