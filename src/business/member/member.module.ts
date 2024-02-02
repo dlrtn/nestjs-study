@@ -8,6 +8,9 @@ import { LocalStrategy } from '../../common/passport/strategy/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { EnvService } from '../../common/env/env.service';
 import { JwtStrategy } from '../../common/passport/strategy/jwt.strategy';
+import { MemberValidService } from './application/member-valid.service';
+import { MemberAuthService } from './application/member-auth.service';
+import { JwtService } from '../../common/jwt/jwt.service';
 
 @Module({
   controllers: [MemberController],
@@ -22,6 +25,14 @@ import { JwtStrategy } from '../../common/passport/strategy/jwt.strategy';
     EnvModule,
     PassportModule,
   ],
-  providers: [MemberService, MemberRepository, LocalStrategy, JwtStrategy],
+  providers: [
+    MemberService,
+    MemberValidService,
+    MemberAuthService,
+    MemberRepository,
+    LocalStrategy,
+    JwtStrategy,
+    JwtService,
+  ],
 })
 export class MemberModule {}
