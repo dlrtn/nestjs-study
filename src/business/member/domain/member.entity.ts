@@ -6,7 +6,6 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 
 @Entity({ name: 'member' })
 export class Member {
@@ -34,13 +33,15 @@ export class Member {
   @CreateDateColumn()
   private readonly createdAt: Date;
 
-  private constructor(
+  public constructor(
     id: string,
     email: string,
     password: string,
     nickname: string,
     phoneNumber: string,
     memberGrade: MemberGrade,
+    updatedAt: Date,
+    createdAt: Date,
   ) {
     this.id = id;
     this.email = email;
@@ -48,27 +49,8 @@ export class Member {
     this.nickname = nickname;
     this.phoneNumber = phoneNumber;
     this.memberGrade = memberGrade;
-  }
-
-  public static of(
-    email: string,
-    password: string,
-    nickname: string,
-    phoneNumber: string,
-  ): Member {
-    const memberId = uuidv4();
-    const memberGrade = MemberGrade.NORMAL;
-
-    const member = new Member(
-      memberId,
-      email,
-      password,
-      nickname,
-      phoneNumber,
-      memberGrade,
-    );
-
-    return member;
+    this.updatedAt = updatedAt;
+    this.createdAt = createdAt;
   }
 
   public getMemberId(): string {
